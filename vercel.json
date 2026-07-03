@@ -1,8 +1,0 @@
-{
-  "version": 2,
-  "routes": [
-    { "src": "/api/proxy", "dest": "/api/proxy.js" },
-    { "src": "/api/xhs-search", "dest": "/api/xhs-search.js" },
-    { "src": "/(.*)", "dest": "/$1" }
-  ]
-}
