@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#FF6B35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="今天吃啥">
+  <meta name="description" content="AI 智能美食推荐 — 根据天气、节气、时间帮你决定今天吃什么">
+  <title>今天吃啥 — AI 美食推荐</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍜</text></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍜</text></svg>">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- Header -->
+  <header class="app-header">
+    <h1 class="app-title">今天吃啥</h1>
+    <p class="app-subtitle">AI 美食推荐官 · 帮你决定每一餐</p>
+  </header>
+
+  <!-- 天气栏 -->
+  <div class="weather-bar">
+    <div class="weather-left">
+      <span class="weather-temp" id="weather-temp">--°</span>
+      <div class="weather-info">
+        <span class="weather-desc" id="weather-desc">--</span>
+        <span class="weather-city" id="weather-city">定位中...</span>
+      </div>
+    </div>
+    <div class="weather-right">
+      <span class="term-name" id="term-name">--</span>
+      <span class="term-tip" id="term-tip"></span>
+    </div>
+  </div>
+
+  <!-- 骨架屏 -->
+  <div id="skeleton">
+    <div class="skeleton-card">
+      <div class="skeleton-line w-60"></div>
+      <div class="skeleton-line w-40"></div>
+      <div class="skeleton-line h-48"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-line w-80"></div>
+      <div class="skeleton-line w-100"></div>
+      <div class="skeleton-line w-60"></div>
+    </div>
+    <div class="skeleton-card">
+      <div class="skeleton-line w-40"></div>
+      <div class="skeleton-line w-100"></div>
+      <div class="skeleton-line w-60 w-0"></div>
+    </div>
+  </div>
+
+  <!-- 错误面板 -->
+  <div id="error-panel" class="error-panel hidden">
+    <div class="error-icon">😵</div>
+    <div class="error-msg" id="error-msg">加载失败</div>
+    <button class="btn btn-primary" id="retry-btn" style="max-width:200px;margin:0 auto;">重新加载</button>
+  </div>
+
+  <!-- 推荐结果 -->
+  <div id="result-panel" class="hidden">
+
+    <!-- 推荐卡片 -->
+    <div class="recommend-card">
+      <div class="card-header">
+        <span class="restaurant-name" id="restaurant-name"></span>
+        <span class="restaurant-category" id="restaurant-category"></span>
+      </div>
+      <div class="card-meta">
+        <span class="meta-item"><span class="value" id="restaurant-rating"></span></span>
+        <span class="meta-item">人均 <span class="value" id="restaurant-price"></span></span>
+        <span class="meta-item"><span class="value" id="restaurant-distance"></span></span>
+      </div>
+      <div class="card-tags" id="restaurant-tags"></div>
+      <button class="btn btn-xhs" id="xhs-search-btn">
+        🔍 小红书搜同款
+      </button>
+    </div>
+
+    <!-- 推荐理由 -->
+    <div class="reason-section">
+      <div class="section-title">推荐理由</div>
+      <div class="reason-item" id="reason-weather"></div>
+      <div class="reason-item" id="reason-seasonal"></div>
+      <div class="reason-item" id="reason-time"></div>
+      <div class="reason-overall" id="reason-overall"></div>
+    </div>
+
+    <!-- 小贴士 -->
+    <div class="tips-section">
+      <div class="section-title">小贴士</div>
+      <div class="tip-row" id="tip-health-row">
+        <span class="tip-icon">💊</span>
+        <span id="tip-health"></span>
+      </div>
+      <div class="tip-row" id="tip-eating-row">
+        <span class="tip-icon">🍽️</span>
+        <span id="tip-eating"></span>
+      </div>
+      <div class="tip-row" id="tip-weather-row">
+        <span class="tip-icon">🌤</span>
+        <span id="tip-weather"></span>
+      </div>
+    </div>
+
+    <!-- 备选方案 -->
+    <div class="alternatives-section collapsed" id="alternatives-section">
+      <div class="section-title">备选方案</div>
+      <div id="alternatives-list"></div>
+    </div>
+
+    <!-- 话题标签 -->
+    <div class="hashtags-row" id="hashtags-row"></div>
+
+  </div>
+
+  <!-- 小红书搜索结果 -->
+  <div id="xhs-results-panel" class="xhs-results-panel hidden">
+    <div class="xhs-results-header">
+      <span class="xhs-results-title">📕 小红书相关笔记</span>
+      <button class="xhs-results-close" id="xhs-close-btn">✕</button>
+    </div>
+    <div class="xhs-results-loading hidden" id="xhs-loading">
+      <span class="spinning">⏳</span> 搜索中...
+    </div>
+    <div class="xhs-results-list" id="xhs-results-list"></div>
+    <button class="btn btn-outline btn-block" id="xhs-open-app-btn" style="display:none;">
+      在小红书 App 中查看更多 →
+    </button>
+  </div>
+
+</div>
+
+<!-- 底部操作栏 -->
+<div class="action-bar" id="action-bar">
+  <button class="btn btn-primary" id="refresh-btn">
+    🔄 换一批
+  </button>
+  <button class="btn btn-outline" id="toggle-alt-btn">
+    查看备选
+  </button>
+  <button class="btn btn-ghost" id="canteen-btn">
+    🍽 食堂
+  </button>
+</div>
+
+<!-- 食堂管理面板 -->
+<div class="modal-overlay hidden" id="canteen-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">🏫 我的食堂</h2>
+      <button class="modal-close" id="canteen-close">✕</button>
+    </div>
+
+    <div class="canteen-toolbar">
+      <button class="btn btn-primary btn-sm" id="canteen-add-btn">+ 添加窗口</button>
+      <button class="btn btn-ghost btn-sm" id="canteen-export-btn">导出</button>
+      <button class="btn btn-ghost btn-sm" id="canteen-import-btn">导入</button>
+      <button class="btn btn-ghost btn-sm" id="canteen-reset-btn">重置</button>
+    </div>
+
+    <!-- 食堂列表 -->
+    <div class="canteen-list" id="canteen-list"></div>
+
+    <!-- 添加/编辑表单 -->
+    <div class="canteen-form hidden" id="canteen-form">
+      <div class="form-row">
+        <label>窗口名称 *</label>
+        <input type="text" id="f-name" placeholder="例：一食堂·瓦罐汤窗口">
+      </div>
+      <div class="form-row form-row-2">
+        <div>
+          <label>所在食堂</label>
+          <input type="text" id="f-canteen" placeholder="一食堂">
+        </div>
+        <div>
+          <label>楼层</label>
+          <input type="text" id="f-floor" placeholder="2楼">
+        </div>
+      </div>
+      <div class="form-row form-row-2">
+        <div>
+          <label>品类 *</label>
+          <select id="f-category">
+            <option value="火锅">火锅</option>
+            <option value="川菜">川菜</option>
+            <option value="面馆">面馆</option>
+            <option value="快餐">快餐</option>
+            <option value="日料">日料</option>
+            <option value="茶饮">茶饮</option>
+            <option value="烧烤">烧烤</option>
+            <option value="小吃">小吃</option>
+            <option value="粤菜">粤菜</option>
+            <option value="轻食">轻食</option>
+            <option value="甜品">甜品</option>
+            <option value="煲汤">煲汤</option>
+            <option value="粥">粥</option>
+            <option value="其他">其他</option>
+          </select>
+        </div>
+        <div>
+          <label>距离（米）</label>
+          <input type="number" id="f-distance" placeholder="80" value="200">
+        </div>
+      </div>
+      <div class="form-row form-row-2">
+        <div>
+          <label>人均（元）</label>
+          <input type="number" id="f-price" placeholder="15" value="20">
+        </div>
+        <div>
+          <label>评分（1-5）</label>
+          <input type="number" id="f-rating" placeholder="4.5" value="4.0" step="0.1" min="1" max="5">
+        </div>
+      </div>
+      <div class="form-row">
+        <label>必点菜</label>
+        <input type="text" id="f-musttry" placeholder="瓦罐鸡汤、排骨汤">
+      </div>
+      <div class="form-row">
+        <label>标签（逗号分隔）</label>
+        <input type="text" id="f-tags" placeholder="校内, 热乎, 养生">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-ghost btn-sm" id="f-cancel">取消</button>
+        <button class="btn btn-primary btn-sm" id="f-save">保存</button>
+      </div>
+    </div>
+
+    <div class="canteen-hint">
+      💡 食堂数据保存在浏览器本地，换设备记得用「导出」备份
+    </div>
+  </div>
+</div>
+
+<input type="file" id="canteen-import-file" accept=".json" class="hidden">
+
+<!-- Scripts -->
+<script src="/js/solar-term.js"></script>
+<script src="/js/engine.js"></script>
+<script src="/js/copywriter.js"></script>
+<script src="/js/tmap.js"></script>
+<script src="/js/canteen.js"></script>
+<script src="/js/app.js"></script>
+
+</body>
+</html>

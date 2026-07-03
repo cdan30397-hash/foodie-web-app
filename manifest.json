@@ -1,0 +1,24 @@
+{
+  "name": "今天吃啥 — AI 美食推荐",
+  "short_name": "今天吃啥",
+  "description": "根据天气、节气、时间智能推荐美食",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#FF6B35",
+  "background_color": "#FAFAFA",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%23FF6B35'/><text x='96' y='140' font-size='110' text-anchor='middle'>🍜</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%23FF6B35'/><text x='256' y='370' font-size='280' text-anchor='middle'>🍜</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
