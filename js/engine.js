@@ -252,7 +252,15 @@
       return { chosen: null, alternatives: [], context: { weatherType: weatherType, timeContext: timeContext, season: timeContext.season || 'summer' } };
     }
 
-    var chosenIndex = Math.floor(Math.random() * topBatch.length);
+    // 如果 topBatch 只有1个，直接返回；否则随机选
+var chosenIndex = topBatch.length === 1 ? 0 : Math.floor(Math.random() * topBatch.length);
+// 再加一个随机偏移，避免始终推荐同一个
+if (topBatch.length >= 3) {
+  var hour = new Date().getHours();
+  var offset = hour % topBatch.length;
+  chosenIndex = (chosenIndex + offset) % topBatch.length;
+}
+
     var chosen = topBatch[chosenIndex];
     var alternatives = [];
     for (var i = 0; i < topBatch.length; i++) {
